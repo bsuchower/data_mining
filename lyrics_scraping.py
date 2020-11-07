@@ -1,3 +1,8 @@
+"""
+Obtains a list of song titles and artist names, generates corresponding
+urls for AZ Lyrics, and scrapes each lyrics page and stores each set of
+lyrics as a text file.
+"""
 import requests
 import string
 import pandas as pd
@@ -89,6 +94,7 @@ def clean_song_data(file_name):
     song_data = pd.read_csv("song_data.csv", names=["a", "artist", "title"])
     song_data = song_data.drop(columns="a", index=[0, 1])
 
+    # removes punctuation, spaces, and makes uppercase characters lowercase
     i = 2  # index starts at 2 since some rows were deleted
     for artist in song_data.artist:
         for character in artist:
@@ -191,7 +197,7 @@ def get_lyrics(url):
     return lyrics
 
 
-def create_lyrics_files(file_name):
+def create_lyrics_files(file_name, start_range, end_range):
     """
     Creates a folder of files containing scraped lyrics.
 
@@ -206,6 +212,12 @@ def create_lyrics_files(file_name):
         file_name: A string containing the name of the file containing
         song names and corresponding artists.
 
+        start_range: An integer containing the beginning of the range to
+        scrape for.
+
+        end_range: An integer containing the end of the range to
+        scrape for.
+
     Returns:
         Writes to a file in the data folder.
     """
@@ -213,7 +225,7 @@ def create_lyrics_files(file_name):
     url_list = get_url(file_name)
 
     i = 1  # filenames start at 1
-    for url in url_list[0:10]:
+    for url in url_list[start_range:end_range]:
         lyrics_file = get_lyrics(url)
         if lyrics_file != "":
             with open(f"data/{i}.txt", "w") as f:
